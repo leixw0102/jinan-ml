@@ -15,9 +15,9 @@ do
 done
   JARS=${JARS:1}
 
-if [ -z "$BASE_OPTS" ]; then
-  BASE_OPTS="-Dservice-conf=$base_dir/conf/active.properties"
-fi
+#if [ -z "$BASE_OPTS" ]; then
+#  BASE_OPTS="-Dservice-conf=$base_dir/conf/active.properties"
+#fi
 
 java_options="$base_dir/conf/active.properties"
 

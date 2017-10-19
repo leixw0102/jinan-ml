@@ -11,7 +11,7 @@ object RedisUtils {
   val filed2="hisDistinct4Day2CountAvg"
   def saveRedis2Hash(key:String,filed:String,value:String): Unit ={
     val jedis = JedisUtil.getJedis;
-    jedis.select(2)
+//    jedis.select(2)
     try{
       jedis.hset(key,filed,value)
     }catch {
@@ -40,7 +40,7 @@ object RedisUtils {
 
   def getValueWithHash(key:String,filed:String):String={
     val jedis = JedisUtil.getJedis;
-    jedis.select(2)
+//    jedis.select(2)
     try{
       return jedis.hget(key,filed)
     }catch {
@@ -74,7 +74,7 @@ object RedisUtils {
   def saveRedis( k:String, value:String):Boolean={
     //    val key=k;
     val jedis = JedisUtil.getJedis;
-    jedis.select(2)
+//    jedis.select(2)
     try{
       jedis.setex(k,2*24*60*60,value);
       true;
