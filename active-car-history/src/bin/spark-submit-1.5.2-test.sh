@@ -22,6 +22,7 @@ cmd="spark-submit\
  --driver-memory ${driverMem}\
  --executor-cores ${executorCore}\
  --executor-memory ${executorMem}\
+ --driver-java-options \"-XX:PermSize=128M -XX:MaxPermSize=512M\"\
  --jars ${jars}\
  --files ${java_options}\
  ${executeJar}\
