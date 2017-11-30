@@ -32,7 +32,7 @@ class Conf(ehlConfiguration: EhlConfiguration) {
     */
   def testEndDateTime = {
     if(existEndDateTime) {
-      DateTime.parse(confEndDateTime + " 00:00:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+      DateTime.parse(confEndDateTime.get + " 00:00:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     }else{
       DateTime.now()
     }
@@ -54,7 +54,7 @@ class Conf(ehlConfiguration: EhlConfiguration) {
     }
   }
 
-  def confDateTime =  DateTime.parse(confStartDateTime+" 00:00:00",DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+  def confDateTime =  DateTime.parse(confStartDateTime.get+" 00:00:00",DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
 
 
   def autoDateTime = {

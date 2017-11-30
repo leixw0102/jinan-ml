@@ -20,7 +20,7 @@ class EsQuery(sQLContext: SQLContext,resource: String,cfg:Map[String,String])ext
       .filter("timestamp>="+from+" and timestamp <"+end)
       //          .filter($"timestamp".between(from.getMillis,end.getMillis)).select("timestamp","car_plate_number" , "car_plate_type")
       .map(x=>{
-      x.getAs[String]("car_plate_number").toUpperCase()+"-"+x.getAs[Int]("car_plate_number")
+      x.getAs[String]("car_plate_number").toUpperCase()+"-"+x.getAs[Int]("car_plate_type")
     })
     esResult
   }

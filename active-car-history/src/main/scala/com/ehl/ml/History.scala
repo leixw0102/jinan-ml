@@ -33,6 +33,7 @@ object History extends AbstractSparkEhl with App{
       * 逻辑块
       */
     val yesterDay = params.dayZero()
+    logger.info("yesterday = "+yesterDay.toString("yyyy-MM-dd HH:mm:ss"))
     //昨天一天数据按点拆分
     for(j <- 0L to params.gradingSize-1 ) {
 //    for(j<- 0L to 2){
@@ -40,28 +41,29 @@ object History extends AbstractSparkEhl with App{
       val tmpDate = yesterDay.plusMinutes(j.toInt*params.gradingTimeMins)
 
       val redisKey = RedisUtils.getRedisKey(tmpDate,params.gradingTimeMins)
+      logger.info("j={},j*5={},yesterday ={},tmpDate={},redisKey={} ",j,j*params.gradingTimeMins,yesterDay.toString("yyyy-MM-dd HH:mm:ss"),tmpDate.toString("yyyy-MM-dd HH:mm:ss"),redisKey)
       var historyRecordsTmp1:RDD[String] = null
       var historyRecordsTmp2:RDD[String] = null;
       for (i <- 0 to params.historySize-1) {
-        val end = tmpDate.plusDays(-i)
-        val from = end.plusMinutes(-params.gradingTimeMins);
+        val from = tmpDate.plusDays(-i)
+        val end = from.plusMinutes(params.gradingTimeMins);
         /**
           * es search
           */
-          logger.info("from={} end ={}",from.getMillis,end.getMillis)
+        logger.info("from={} end ={}",from.getMillis,end.getMillis)
         val esResult = esQuery.query(from.getMillis,end.getMillis)
-        esResult.cache()
+        val esCache = esResult.cache()
         //算法实现
         if(null != historyRecordsTmp1){
-          historyRecordsTmp1 = historyRecordsTmp1.union(esResult.distinct())
+          historyRecordsTmp1 = historyRecordsTmp1.union(esCache.distinct())
         }else{
-          historyRecordsTmp1=esResult.distinct()
+          historyRecordsTmp1=esCache.distinct()
         }
 
         if(null == historyRecordsTmp2){
-          historyRecordsTmp2 = esResult
+          historyRecordsTmp2 = esCache
         }else{
-          historyRecordsTmp2 =historyRecordsTmp2.union(esResult)
+          historyRecordsTmp2 =historyRecordsTmp2.union(esCache)
         }
       }
 
