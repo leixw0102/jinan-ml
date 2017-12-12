@@ -43,9 +43,7 @@ class Worker(esQuery: EsQuery,conf: Conf) {
       //1
       //      logger.info("redis key ="+redisKey+"\t"+hisDistinct4Day2CountAvg +"\t"+hisDistinct4Day2Count)
       val value =  s"{'recordTime':${from.getMillis},'createTime':${System.currentTimeMillis()},'avgVehCount':${(totalVehicleCount/conf.totalKM.toFloat).formatted("%.2f")},'activeVehCount':${carCurCount}}"
-      println(value
-        +"\t λ="+λ+"\t hisDistinct4Day2Count="+hisDistinct4Day2Count+"\t totalVehicleCount="+totalVehicleCount
-        +"\t hisDistinct4Day2CountAvg="+hisDistinct4Day2CountAvg+"\t totalKm="+conf.totalKM)
+      println(value)
 
       RedisUtils.saveRedis("activecarinfo_" + from.getMillis,value)
     }else{

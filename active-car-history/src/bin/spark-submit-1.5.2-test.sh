@@ -13,11 +13,12 @@ mode=cluster
 driverMem=4g
 executorCore=2
 executorMem=2g
-
+timeout=480
 cmd="spark-submit\
  --master ${master}\
  --deploy-mode ${mode}\
  --class ${main_class}\
+ --conf spark.rpc.askTimeout=${timeout}\
  --num-executors 3\
  --driver-memory ${driverMem}\
  --executor-cores ${executorCore}\
