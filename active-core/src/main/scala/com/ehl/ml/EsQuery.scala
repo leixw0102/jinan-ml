@@ -14,14 +14,19 @@ object EsQuery {
 class EsQuery(sQLContext: SQLContext,resource: String,cfg:Map[String,String])extends Serializable{
   def query(from:Long,end:Long):RDD[String]={
     //es 结果
-    val esResult = sQLContext.esDF(resource,cfg)
-      .select("timestamp","car_plate_number" , "car_plate_type")
-      .filter("car_plate_number is not null").filter("car_plate_type is not null")
-      .filter("timestamp>="+from+" and timestamp <"+end)
-      //          .filter($"timestamp".between(from.getMillis,end.getMillis)).select("timestamp","car_plate_number" , "car_plate_type")
-      .map(x=>{
-      x.getAs[String]("car_plate_number").toUpperCase()+"-"+x.getAs[Int]("car_plate_type")
-    })
-    esResult
+    try {
+      val esResult = sQLContext.esDF(resource, cfg)
+        .select("timestamp", "car_plate_number", "car_plate_type")
+        .filter("car_plate_number is not null").filter("car_plate_type is not null")
+        .filter("timestamp>=" + from + " and timestamp <" + end)
+        //          .filter($"timestamp".between(from.getMillis,end.getMillis)).select("timestamp","car_plate_number" , "car_plate_type")
+        .map(x => {
+        x.getAs[String]("car_plate_number").toUpperCase() + "-" + x.getAs[Int]("car_plate_type")
+      })
+      esResult
+    }catch {
+      case e:Exception=>e.printStackTrace();null;
+    }
+
   }
 }

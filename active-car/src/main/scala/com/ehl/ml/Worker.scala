@@ -21,6 +21,10 @@ class Worker(esQuery: EsQuery,conf: Conf) {
 
   def work(from:DateTime,end:DateTime): Unit ={
     val esResult = esQuery.query(from.getMillis,end.getMillis)
+    if(null == esResult) {
+      logger.info("search es null or exception ")
+      return
+    };
     val redisKey = RedisUtils.getRedisKey(from,end)
     logger.info("rediskey = "+redisKey)
 
@@ -32,14 +36,16 @@ class Worker(esQuery: EsQuery,conf: Conf) {
     //参照老版本
     if(carCurCount != 0) {
       //3
-      val λ = esResult.distinct().count() / hisDistinct4Day2CountAvg
+      val λ = esResult.distinct().count() / hisDistinct4Day2CountAvg.toFloat
       //2
       val hisDistinct4Day2Count = getRedisKeyFiled1Long(redisKey)
       val totalVehicleCount = λ * hisDistinct4Day2Count
       //1
       //      logger.info("redis key ="+redisKey+"\t"+hisDistinct4Day2CountAvg +"\t"+hisDistinct4Day2Count)
-      val value =  s"{'recordTime':${from.getMillis},'createTime':${System.currentTimeMillis()},'avgVehCount':${totalVehicleCount/conf.totalKM},'activeVehCount':${carCurCount}}"
-      println(value)
+      val value =  s"{'recordTime':${from.getMillis},'createTime':${System.currentTimeMillis()},'avgVehCount':${(totalVehicleCount/conf.totalKM.toFloat).formatted("%.2f")},'activeVehCount':${carCurCount}}"
+      println(value
+        +"\t λ="+λ+"\t hisDistinct4Day2Count="+hisDistinct4Day2Count+"\t totalVehicleCount="+totalVehicleCount
+        +"\t hisDistinct4Day2CountAvg="+hisDistinct4Day2CountAvg+"\t totalKm="+conf.totalKM)
 
       RedisUtils.saveRedis("activecarinfo_" + from.getMillis,value)
     }else{
