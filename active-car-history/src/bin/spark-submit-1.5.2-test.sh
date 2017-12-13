@@ -10,9 +10,9 @@ java_options=$5
 jars=$6
 master=yarn
 mode=cluster
-driverMem=4g
+driverMem=2g
 executorCore=2
-executorMem=2g
+executorMem=1g
 timeout=480
 cmd="spark-submit\
  --master ${master}\
