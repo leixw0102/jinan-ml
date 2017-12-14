@@ -30,7 +30,10 @@ class Worker(esQuery: EsQuery,conf: Conf) {
 
 
     val hisDistinct4Day2CountAvg = getRedisKeyFiled2Long(redisKey)
-
+    if(hisDistinct4Day2CountAvg==0){
+      logger.info("active history service is not finished,you may waiting for it to finish")
+      return
+    }
     val carCurCount = esResult.count()
 
     //参照老版本
@@ -42,10 +45,10 @@ class Worker(esQuery: EsQuery,conf: Conf) {
       val totalVehicleCount = λ * hisDistinct4Day2Count
       //1
       //      logger.info("redis key ="+redisKey+"\t"+hisDistinct4Day2CountAvg +"\t"+hisDistinct4Day2Count)
-      val value =  s"{'recordTime':${from.getMillis},'createTime':${System.currentTimeMillis()},'avgVehCount':${(totalVehicleCount/conf.totalKM.toFloat).formatted("%.2f")},'activeVehCount':${carCurCount}}"
+      val value =  s"{'recordTime':${end.getMillis},'createTime':${System.currentTimeMillis()},'avgVehCount':${(totalVehicleCount/conf.totalKM.toFloat).formatted("%.2f")},'activeVehCount':${carCurCount}}"
       println(value)
 
-      RedisUtils.saveRedis("activecarinfo_" + from.getMillis,value)
+      RedisUtils.saveRedis("activecarinfo_" + end.getMillis,value)
     }else{
 
       println(
@@ -56,40 +59,6 @@ class Worker(esQuery: EsQuery,conf: Conf) {
 
     }
   }
-//
-//  def work(from:DateTime,end:DateTime,window:Int) ={
-//    val esResult = esQuery.query(from.getMillis,end.getMillis)
-//    val redisKey = RedisUtils.getRedisKey(from,window)
-//    logger.info("rediskey = "+redisKey)
-//    val hisDistinct4Day2CountAvg = RedisUtils.getFiled2ValueWithHash(redisKey).toLong
-//
-//    val carCurCount = esResult.count()
-//
-//    //参照老版本
-//    if(carCurCount != 0) {
-//      //3
-//      val λ = esResult.distinct().count() / hisDistinct4Day2CountAvg
-//      //2
-//      val hisDistinct4Day2Count = RedisUtils.getFiled1ValueWithHash(redisKey).toLong
-//      val totalVehicleCount = λ * hisDistinct4Day2Count
-//      //1
-////      logger.info("redis key ="+redisKey+"\t"+hisDistinct4Day2CountAvg +"\t"+hisDistinct4Day2Count)
-//      val value =  s"{'recordTime':${from.getMillis},'createTime':${System.currentTimeMillis()},'avgVehCount':${totalVehicleCount/conf.totalKM},'activeVehCount':${carCurCount}}"
-//      println(value)
-//
-//      RedisUtils.saveRedis("activecarinfo_" + from.getMillis,value)
-//    }else{
-//
-//      println(
-//        s""" recordTime=${from.toString("yyyy-MM-dd HH:mm:ss")}
-//            |  createTime=${DateTime.now().toString("yyyy-MM-dd HH:mm:ss")}
-//            |  activeVehCount=${}
-//          """.stripMargin)
-//
-//    }
-//  }
-
-
 }
 
 object Worker extends Serializable{
